@@ -1,0 +1,7 @@
+networkx
+fastapi
+uvicorn
+openai
+streamlit
+pyvis
+python-dotenv

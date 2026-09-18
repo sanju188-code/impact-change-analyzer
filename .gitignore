@@ -15,6 +15,9 @@ frontend/node_modules/
 frontend/dist/
 frontend/.vite/
 
+# Local nested repo backup folder
+change-impact-analyzer/
+
 # OS/editor files
 .DS_Store
 Thumbs.db
