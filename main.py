@@ -1,5 +1,9 @@
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from typing import Literal, Optional, Union
 import uvicorn
@@ -8,6 +12,9 @@ from contextlib import asynccontextmanager
 from data import load_sample_data, INCIDENTS
 from agent import analyze_change, chat_followup
 from db import get_recent_analyses, init_db, save_analysis
+
+BASE_DIR = Path(__file__).resolve().parent
+FRONTEND_DIST = BASE_DIR / "frontend" / "dist"
 
 # Application State
 class AppState:
@@ -32,17 +39,28 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Change Impact Analyzer API", lifespan=lifespan)
 
-# CORS middleware allowing localhost (Streamlit typically runs on 8501)
+if FRONTEND_DIST.exists():
+    app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIST / "assets")), name="assets")
+
+@app.get("/")
+def root():
+    index_file = FRONTEND_DIST / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    return {
+        "message": "Change Impact Analyzer API is running.",
+        "endpoints": [
+            "/health",
+            "/analyze-change",
+            "/chat",
+            "/history",
+        ],
+    }
+
+# CORS middleware — allow all origins for production (frontend is served from same origin on Render)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8501",
-        "http://127.0.0.1:8501",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -1,7 +1,7 @@
 networkx
 fastapi
-uvicorn
+uvicorn[standard]
+gunicorn
 openai
-streamlit
 pyvis
 python-dotenv

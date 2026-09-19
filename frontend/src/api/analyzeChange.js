@@ -1,6 +1,7 @@
-const API_URL = 'http://localhost:8000/analyze-change'
-const CHAT_API_URL = 'http://localhost:8000/chat'
-const HISTORY_API_URL = 'http://localhost:8000/history'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = `${API_BASE_URL}/analyze-change`
+const CHAT_API_URL = `${API_BASE_URL}/chat`
+const HISTORY_API_URL = `${API_BASE_URL}/history`
 
 export async function analyzeChange(changeDescription) {
   const response = await fetch(API_URL, {
